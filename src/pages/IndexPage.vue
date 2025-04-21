@@ -6,7 +6,7 @@
         <q-icon name="arrow_right_alt" size="md" />
         <q-img height="100px" fit="scale-down" width="100px" src="src/assets/Mario-blurred.webp" />
       </div>
-      <div class="row flex-center">Exemplo de convolução utilizando kernel de blur</div>
+      <div class="row flex-center">EXEMPLO DE CONVOLUCAO UTILIZANDO KERNEL DE BLUR</div>
     </q-card>
     <div class="row fit flex-center">
       <PrimaryButton

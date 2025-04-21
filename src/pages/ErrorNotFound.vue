@@ -1,5 +1,5 @@
 <template>
-  <div style="background-image: url("/src/assets/brainrot.jpg);" class="fullscreen text-white text-center q-pa-md flex flex-center">
+  <div style="background-image: url('/src/assets/brainrot.jpg')" class="fullscreen text-white text-center q-pa-md flex flex-center">
     <q-btn
       class="q-mt-xl"
       color="white"
@@ -13,5 +13,5 @@
 </template>
 
 <script setup lang="ts">
-//
+
 </script>

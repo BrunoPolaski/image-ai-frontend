@@ -4,7 +4,11 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/',
     component: () => import('layouts/MainLayout.vue'),
-    children: [{ path: '', component: () => import('pages/IndexPage.vue') }],
+    children: [
+      { path: '', component: () => import('pages/IndexPage.vue') },
+      { path: 'characteristics', component: () => import('pages/CharacteristicsInputPage.vue') },
+      { path: 'upload', component: () => import('pages/FolderUploadPage.vue') },
+    ],
   },
   {
     path: '/:catchAll(.*)*',

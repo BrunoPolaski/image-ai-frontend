@@ -9,6 +9,7 @@
     :loading="loading"
     :rounded="rounded"
     :size="size"
+    :fab="fab"
     @click="emit('click', $event)"
     >
         <slot></slot>
@@ -42,7 +43,8 @@ defineProps({
     padding: {
         type: String,
         default: 'md'
-    }
+    },
+    fab: Boolean
 });
 
 const emit = defineEmits(['click']);
