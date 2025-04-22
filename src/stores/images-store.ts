@@ -4,14 +4,14 @@ import http from 'src/http/http';
 
 export const useImagesStore = defineStore('counter', {
   state: () => ({
-    trainingImages: [] as string[],
-    testImages: [] as string[],
+    trainingFiles: [] as File[],
+    testFiles: [] as File[],
     isLoading: false,
   }),
 
   actions: {
     uploadFiles() {
-      if (this.trainingImages.length === 0 && this.testImages.length === 0) {
+      if (this.trainingFiles.length === 0 && this.testFiles.length === 0) {
         Notify.create({
           message: 'Selecione pelo menos um arquivo para upload',
           color: 'negative',
@@ -23,11 +23,11 @@ export const useImagesStore = defineStore('counter', {
       this.isLoading = true;
       const formData = new FormData();
       
-      this.trainingImages.forEach((file) => {
+      this.trainingFiles.forEach((file) => {
           formData.append('trainingFiles', file);
       });
       
-      this.testImages.forEach((file) => {
+      this.testFiles.forEach((file) => {
           formData.append('testFiles', file);
       });
 
@@ -42,10 +42,29 @@ export const useImagesStore = defineStore('counter', {
         })
         .finally(() => {
           this.isLoading = false;
-          this.trainingImages = [];
-          this.testImages = [];
+          this.trainingFiles = [];
+          this.testFiles = [];
         }
       );
-    }
+    },
+    handleTestFolderChange(event: Event) {
+      console.log('Test folder changed:', event);
+      const files = (event.target as HTMLInputElement).files;
+
+      if (files) {
+        for (const file of files) {
+          this.testFiles.push(file);
+        }
+      }
+    },
+    handleTrainingFolderChange(event: Event) {
+      const files = (event.target as HTMLInputElement).files;
+
+      if (files) {
+        for (const file of files) {
+          this.trainingFiles.push(file);
+        }
+      }
+    },
   },
 });
