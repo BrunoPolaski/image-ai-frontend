@@ -1,19 +1,29 @@
 <template>
-  <div class="column justify-evenly q-pa-md q-ma-md q-gutter-md bordered" :style="getStyle">
+  <div class="column flex-center q-pa-md q-ma-md bordered" :style="getStyle">
     <q-input
+      class="fit"
       filled
+      dense
       v-model="name"
       label="Nome da característica"
-      class="q-ma-md"
       color="black"
       bg-color="white"
+      :rules="[
+        (val: string) => !!val || 'Campo obrigatório',
+        (val: string) => val.length <= 20 || 'Máximo de 20 caracteres'
+      ]"
+      lazy-rules
     />
     <q-input
+      class="fit"
       v-model="color"
+      filled
+      dense
       label="Cor da característica"
-      class="q-ma-md"
-      rounded
-      :rules="['rgbOrRgbaColor']"
+      :rules="[
+        (val: string) => !!val || 'Campo obrigatório',
+        (val: string) => /^rgb\(\d{1,3}, \d{1,3}, \d{1,3}\)$/.test(val) || 'Formato inválido'
+      ]"
       bg-color="white"
     >
       <template #append>
@@ -40,7 +50,7 @@ const name = defineModel<string>('name');
 const color = defineModel<string>('color');
 
 const getStyle = computed(() => {
-  const safeColor = color.value || '#cccccc';
+  const safeColor = color.value || 'rgb(0, 0, 0)'; 
   return {
     backgroundColor: safeColor,
     borderColor: safeColor,

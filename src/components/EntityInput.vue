@@ -19,14 +19,16 @@
             v-model:color="characteristic.color"
         />
         <div class="row justify-center">
-            <q-btn
+            <PrimaryButton
                 rounded
                 v-if="characteristics!.length < 3"
-                class="q-ma-md"
-                color="primary"
                 label="Adicionar característica"
                 icon="add"
                 @click="addCharacteristic"
+            />
+            <AddFolderBtn
+                @folder-change="$emit('folderChange', $event)"
+                class="q-ma-md"
             />
         </div>
     </q-card>
@@ -35,6 +37,10 @@
 <script setup lang="ts">
 import type Characteristic from 'src/models/characteristics';
 import CharacteristicInput from './CharacteristicInput.vue';
+import AddFolderBtn from './AddFolderBtn.vue';
+import PrimaryButton from './PrimaryButton.vue';
+
+defineEmits(['folderChange']);
 
 const name = defineModel<string>('name');
 

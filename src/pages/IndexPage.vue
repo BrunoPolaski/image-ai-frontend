@@ -8,7 +8,7 @@
       </div>
       <div class="row flex-center">EXEMPLO DE CONVOLUCAO UTILIZANDO KERNEL DE BLUR</div>
     </q-card>
-    <div class="row fit flex-center">
+    <div class="column fit flex-center">
       <PrimaryButton
         class="width-40"
         label="Input de características"

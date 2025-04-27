@@ -51,7 +51,7 @@ import { ref } from 'vue';
         {
           id: Date.now(),
           name: '',
-          color: '#000000'
+          color: 'rgb(0, 0, 0)'
         }
       ]
     }
@@ -65,7 +65,7 @@ import { ref } from 'vue';
         {
           id: Date.now(),
           name: '',
-          color: '#000000'
+          color: 'rgb(0, 0, 0)'
         }
       ]
     };
