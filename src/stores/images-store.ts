@@ -6,6 +6,8 @@ export const useImagesStore = defineStore('counter', {
   state: () => ({
     trainingFiles: [] as File[],
     testFiles: [] as File[],
+    testFolderName: '',
+    trainingFolderName: '',
     isLoading: false,
   }),
 
@@ -48,7 +50,7 @@ export const useImagesStore = defineStore('counter', {
       );
     },
     handleTestFolderChange(event: Event) {
-      console.log('Test folder changed:', event);
+      this.testFolderName = (event.target as HTMLInputElement).files!.item(0)!.webkitRelativePath;
       const files = (event.target as HTMLInputElement).files;
 
       if (files) {
@@ -58,6 +60,7 @@ export const useImagesStore = defineStore('counter', {
       }
     },
     handleTrainingFolderChange(event: Event) {
+      this.trainingFolderName = (event.target as HTMLInputElement).value;
       const files = (event.target as HTMLInputElement).files;
 
       if (files) {

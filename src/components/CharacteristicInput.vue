@@ -13,6 +13,7 @@
       label="Cor da característica"
       class="q-ma-md"
       rounded
+      :rules="['rgbOrRgbaColor']"
       bg-color="white"
     >
       <template #append>

@@ -15,40 +15,37 @@
                         style="display: none"
                         @change="imageStore.handleTestFolderChange"
                     />
-                    <div class="row flex-center text-subtitle1">Arquivos selecionados para teste:</div>
-                    <q-list class="bg-secondary bordered" style="height: 200px;overflow: scroll;">
-                        <q-item v-for="(file, index) in imageStore.testFiles" :key="index">
-                            <q-item-section>{{ file.name }}</q-item-section>
-                            <q-item-section side>
-                                <q-btn
-                                    icon="delete"
-                                    color="negative"
-                                    @click="imageStore.testFiles.splice(index, 1)"
-                                    round
-                                    dense
-                                />
-                            </q-item-section>
-                        </q-item>
-                    </q-list>
+                    <div v-if="imageStore.testFolderName" class="row flex-center text-subtitle1">Pasta para teste:</div>
+                    <div class="row flex-center text-h6">
+                        {{ imageStore.testFolderName }}
+                    </div>
                 </div>
-                <q-btn rounded icon="folder" label="Selecionar arquivos de TREINO" @click="triggerTrainingFolderInput" />
-                <input
-                    ref="trainingFolderInput"
-                    type="file"
-                    webkitdirectory
-                    multiple
-                    style="display: none"
-                    @change="imageStore.handleTrainingFolderChange"
-                />
+                <div>
+                    <PrimaryButton rounded icon="folder" label="Selecionar arquivos de TREINO" @click="triggerTrainingFolderInput" />
+                    <input
+                        ref="trainingFolderInput"
+                        type="file"
+                        webkitdirectory
+                        multiple
+                        style="display: none"
+                        @change="imageStore.handleTrainingFolderChange"
+                    />
+                    <div v-if="imageStore.trainingFolderName" class="row flex-center text-subtitle1">Pasta para treino:</div>
+                    <div class="row flex-center text-h6">
+                        {{ imageStore.trainingFolderName }}
+                    </div>
+                </div>
             </div>
-            <q-btn
+            <div
+                class="fixed-bottom-right"
+            >  
+                <PrimaryButton
+                label="Enviar"
+                icon="send"
                 rounded
-                color="primary"
-                icon="add"
-                label="Fazer upload de pastas"
-                type="submit"
-                :loading="imageStore.isLoading"
+                size="lg"
             />
+            </div>
         </q-form>
     </q-page>
 </template>

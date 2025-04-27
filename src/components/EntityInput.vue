@@ -1,7 +1,7 @@
 <template>
     <q-card>
         <q-input
-            filled
+            outlined
             v-model="name"
             label="Nome da entidade"
             class="q-ma-md"
@@ -10,6 +10,7 @@
                 (val: string) => val.length <= 20 || 'Máximo de 20 caracteres',    
             ]"
             lazy-rules
+            input-class="text-h5 text-center"
         />
         <CharacteristicInput
             v-for="(characteristic, index) in characteristics"

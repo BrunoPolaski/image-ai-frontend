@@ -1,23 +1,27 @@
 <template>
-    <q-page class="row items-center justify-evenly animated">
-      <transition-group
-          appear
-          enter-active-class="animated fadeIn slower"
-          leave-active-class="animated fadeOut">
-        <EntityInput
-            v-for="entity in entities"
-            :key="entity.id"
-            :characteristics="entity.characteristics"
+    <q-page class="column flex-center animated">
+      <q-btn @click="$router.back()" icon="arrow_back" size="lg" color="primary" round />
+      <div class="row flex-center">
+        <transition-group
+            appear
+            enter-active-class="animated fadeIn slower"
+            leave-active-class="animated fadeOut">
+          <EntityInput
+              class="q-ma-md bordered"
+              v-for="entity in entities"
+              :key="entity.id"
+              :characteristics="entity.characteristics"
+          />
+        </transition-group>
+        <PrimaryButton
+          v-if="entities.length < 3"
+          label="Adicionar entidade"
+          icon="add"
+          rounded
+          size="lg"
+          @click="addEntity"
         />
-      </transition-group>
-      <PrimaryButton
-        v-if="entities.length < 3"
-        label="Adicionar entidade"
-        icon="add"
-        rounded
-        size="lg"
-        @click="addEntity"
-      />
+      </div>
       <div
         class="fixed-bottom-right"
       >  
