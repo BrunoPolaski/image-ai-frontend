@@ -1,21 +1,26 @@
 import { defineStore } from 'pinia';
 import { Notify } from 'quasar';
 import http from 'src/http/http';
+import type Entity from 'src/models/entity';
+import { createEntity } from 'src/models/entity';
 
 export const useImagesStore = defineStore('counter', {
   state: () => ({
-    trainingFiles: [] as File[],
-    testFiles: [] as File[],
-    testFolderName: '',
-    trainingFolderName: '',
+    entities: [
+      createEntity(),
+    ] as Entity[],
+    testAndTrainingFolderName: '',
     isLoading: false,
   }),
 
   actions: {
-    uploadFiles() {
-      if (this.trainingFiles.length === 0 && this.testFiles.length === 0) {
+    addEntity() {
+      this.entities.push(createEntity());
+    },
+    async uploadFiles() {
+      if (this.entities.length === 0) {
         Notify.create({
-          message: 'Selecione pelo menos um arquivo para upload',
+          message: 'Necessário adicionar ao menos uma entidade',
           color: 'negative',
         });
         
@@ -24,50 +29,66 @@ export const useImagesStore = defineStore('counter', {
 
       this.isLoading = true;
       const formData = new FormData();
-      
-      this.trainingFiles.forEach((file) => {
-          formData.append('trainingFiles', file);
-      });
-      
-      this.testFiles.forEach((file) => {
-          formData.append('testFiles', file);
-      });
 
-      http.requestPost('/upload', formData, {
-        'Content-Type': 'multipart/form-data',
-      })
-        .then((response) => {
+      for (const entity of this.entities) {
+        entity.files.forEach((file) => {
+          formData.append(entity.name + '_' + 'files', file);
+        });
+        entity.trainingFiles.forEach((file) => {
+          formData.append(entity.name + '_' + 'training_files', file);
+        });
+        entity.testFiles.forEach((file) => {
+          formData.append(entity.name + '_' + 'test_files', file);
+        });
+
+        formData.append('classname', entity.name);
+        await http.post('/upload', formData, {
+          'Content-Type': 'multipart/form-data',
+        })
+          .then((response: any) => {
+            console.log('Files uploaded successfully:', response);
+          })
+          .catch((error: any) => {
+            console.error('Error uploading files:', error);
+          });
+      }
+    },
+    async uploadCharacteristicFiles() {
+      if (this.entities.length === 0) {
+        Notify.create({
+          message: 'Necessário adicionar ao menos uma entidade',
+          color: 'negative',
+        });
+        
+        return;
+      }
+
+      this.isLoading = true;
+      const formData = new FormData();
+
+      for (const entity of this.entities) {
+        const buffer: Array<File> = [];
+
+        entity.files.forEach((file) => {
+          if (buffer.length < 100) {
+            buffer.push(file);
+          }
+        });
+
+        buffer.forEach((file) => {
+          formData.append(entity.name + '_' + 'files', file);
+        });
+        formData.append('classname', entity.name);
+
+        try {
+          const response = await http.post('/upload', formData, {
+            'Content-Type': 'multipart/form-data',
+          });
           console.log('Files uploaded successfully:', response);
-        })
-        .catch((error) => {
+        } catch (error) {
           console.error('Error uploading files:', error);
-        })
-        .finally(() => {
-          this.isLoading = false;
-          this.trainingFiles = [];
-          this.testFiles = [];
-        }
-      );
-    },
-    handleTestFolderChange(event: Event) {
-      this.testFolderName = (event.target as HTMLInputElement).files!.item(0)!.webkitRelativePath;
-      const files = (event.target as HTMLInputElement).files;
-
-      if (files) {
-        for (const file of files) {
-          this.testFiles.push(file);
         }
       }
-    },
-    handleTrainingFolderChange(event: Event) {
-      this.trainingFolderName = (event.target as HTMLInputElement).value;
-      const files = (event.target as HTMLInputElement).files;
-
-      if (files) {
-        for (const file of files) {
-          this.trainingFiles.push(file);
-        }
-      }
-    },
+    }
   },
 });

@@ -22,7 +22,7 @@
       label="Cor da característica"
       :rules="[
         (val: string) => !!val || 'Campo obrigatório',
-        (val: string) => /^rgb\(\d{1,3}, \d{1,3}, \d{1,3}\)$/.test(val) || 'Formato inválido'
+        (val: string) => /^rgb\(\d{1,3},\d{1,3},\d{1,3}\)$/.test(val) || 'Formato inválido'
       ]"
       bg-color="white"
     >
@@ -50,7 +50,7 @@ const name = defineModel<string>('name');
 const color = defineModel<string>('color');
 
 const getStyle = computed(() => {
-  const safeColor = color.value || 'rgb(0, 0, 0)'; 
+  const safeColor = color.value || 'rgb(0,0,0)'; 
   return {
     backgroundColor: safeColor,
     borderColor: safeColor,

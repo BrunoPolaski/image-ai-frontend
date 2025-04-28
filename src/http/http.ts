@@ -34,7 +34,7 @@ const refreshToken = async (): Promise<SuccessResponse> => {
 	return { success: false }
 }
 
-const requestPost = async function (path: string, body: any, headers?: any, retried = 0): Promise<any> {
+const post = async function (path: string, body: any, headers?: any, retried = 0): Promise<any> {
 	console.log('url', `${BASE_URL}${path}`)
 
 	const token = localStorage.getItem('accessToken')
@@ -52,7 +52,7 @@ const requestPost = async function (path: string, body: any, headers?: any, retr
 		if (error.response && error.response.status === 401) {
 			const result = await refreshToken()
 			if (result.success && retried < MAX_RETRIES) {
-				return requestPost(path, body, headers, retried + 1)
+				return post(path, body, headers, retried + 1)
 			} else {
 				throw new UnauthorizedError()
 			}
@@ -67,7 +67,7 @@ const requestPost = async function (path: string, body: any, headers?: any, retr
 	}
 }
 
-const requestGet = async function (path: string, params?: any, headers?: any, retried = 0): Promise<any> {
+const get = async function (path: string, params?: any, headers?: any, retried = 0): Promise<any> {
 	const token = localStorage.getItem('accessToken')
 	headers = {
 		...headers,
@@ -86,7 +86,7 @@ const requestGet = async function (path: string, params?: any, headers?: any, re
 		if (error.response && error.response.status === 401) {
 			const result = await refreshToken()
 			if (result.success && retried < MAX_RETRIES) {
-				return requestGet(path, params, headers, retried + 1)
+				return get(path, params, headers, retried + 1)
 			} else {
 				throw new UnauthorizedError()
 			}
@@ -101,4 +101,4 @@ const requestGet = async function (path: string, params?: any, headers?: any, re
 	}
 }
 
-export default { requestGet, requestPost }
+export default { get, post }

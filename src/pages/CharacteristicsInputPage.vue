@@ -1,6 +1,8 @@
 <template>
     <q-page class="column flex-center animated">
-      <q-btn @click="$router.back()" icon="arrow_back" size="lg" color="primary" round />
+      <div class="fit row justify-start q-pa-md">
+        <q-btn @click="$router.back()" icon="arrow_back" size="lg" color="primary" round />
+      </div>
       <div class="row flex-center">
         <transition-group
             appear
@@ -8,18 +10,21 @@
             leave-active-class="animated fadeOut">
           <EntityInput
               class="q-ma-md bordered"
-              v-for="entity in entities"
+              v-for="entity in imagesStore.entities"
               :key="entity.id"
-              :characteristics="entity.characteristics"
+              :entity="entity"
+              with-characteristics
+              with-folder
+              single-folder
           />
         </transition-group>
         <PrimaryButton
-          v-if="entities.length < 3"
+          v-if="imagesStore.entities.length < 3"
           label="Adicionar entidade"
           icon="add"
           rounded
           size="lg"
-          @click="addEntity"
+          @click="imagesStore.addEntity"
         />
       </div>
       <div
@@ -30,7 +35,7 @@
           icon="send"
           rounded
           size="lg"
-          @click="addEntity"
+          @click="imagesStore.uploadCharacteristicFiles"
         />
       </div>
     </q-page>
@@ -39,37 +44,8 @@
   <script setup lang="ts">
 import EntityInput from 'src/components/EntityInput.vue';
 import PrimaryButton from 'src/components/PrimaryButton.vue';
-import type Entity from 'src/models/entity';
-import type { Ref} from 'vue';
-import { ref } from 'vue';
-  
- const entities: Ref<Entity[]> = ref([
-    {
-      id: Date.now(),
-      name: '',
-      characteristics: [
-        {
-          id: Date.now(),
-          name: '',
-          color: 'rgb(0, 0, 0)'
-        }
-      ]
-    }
-  ]);
-  
-  const addEntity = () => {
-    const newEntity: Entity = {
-      id: Date.now(),
-      name: '',
-      characteristics: [
-        {
-          id: Date.now(),
-          name: '',
-          color: 'rgb(0, 0, 0)'
-        }
-      ]
-    };
-    entities.value.push(newEntity);
-  };
-  </script>
+import { useImagesStore } from 'src/stores/images-store';
+
+const imagesStore = useImagesStore();
+</script>
   
