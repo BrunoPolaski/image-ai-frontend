@@ -1,6 +1,6 @@
 <template>
     <q-page class="column flex-center animated">
-      <div class="fit row justify-start q-pa-md">
+      <div class="fit row justify-center q-pa-md">
         <q-btn @click="$router.back()" icon="arrow_back" size="lg" color="primary" round />
       </div>
       <div class="row flex-center">
@@ -15,7 +15,6 @@
               :entity="entity"
               with-characteristics
               with-folder
-              single-folder
           />
         </transition-group>
         <PrimaryButton
@@ -44,8 +43,14 @@
   <script setup lang="ts">
 import EntityInput from 'src/components/EntityInput.vue';
 import PrimaryButton from 'src/components/PrimaryButton.vue';
+import { createEntity } from 'src/models/entity';
 import { useImagesStore } from 'src/stores/images-store';
+import { onBeforeMount } from 'vue';
 
 const imagesStore = useImagesStore();
+
+onBeforeMount(() => {
+    imagesStore.entities = [createEntity()];
+});
 </script>
   

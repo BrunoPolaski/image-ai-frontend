@@ -6,10 +6,6 @@ export default interface Entity {
     name: string;
     characteristics: Characteristic[];
     files: File[];
-    trainingFiles: File[];
-    testFiles: File[];
-    testFolderName: string | undefined;
-    trainingFolderName: string | undefined;
 }
 
 export function createEntity(partial?: Partial<Entity>): Entity {
@@ -22,10 +18,6 @@ export function createEntity(partial?: Partial<Entity>): Entity {
             color: 'rgb(0,0,0)',
         }],
         files: [],
-        trainingFiles: [],
-        testFiles: [],
-        testFolderName: undefined,
-        trainingFolderName: undefined,
         ...partial,
     };
 }

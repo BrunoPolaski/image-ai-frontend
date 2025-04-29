@@ -1,5 +1,11 @@
 <template>
-    <PrimaryButton rounded icon="folder" :label="label || ''" @click="triggerFolderInput" />
+    <PrimaryButton 
+        rounded
+        :icon="folderSelected ? 'check' : 'folder'"
+        :label="folderSelected ? 'Pasta selecionada' : 'Selecionar pasta de imagens'"
+        @click="triggerFolderInput"
+        :color="folderSelected ? 'green' : 'primary'"
+    />
     <input
         ref="folderInput"
         type="file"
@@ -7,15 +13,6 @@
         multiple
         style="display: none"
         @change="$emit('folderChange', $event)"
-    />
-    <q-btn
-        icon="delete"
-        class="q-ma-md"
-        color="red"
-        size="md"
-        rounded
-        v-if="folderInput && folderInput.files && folderInput.files.length > 0"
-        @click="emptyFiles"
     />
 </template>
 
@@ -32,17 +29,15 @@ const triggerFolderInput = () => {
     }
 };
 
-const emptyFiles = () => {
-    if (folderInput.value) {
-        folderInput.value.files = null;
-    }
-};
-
 defineProps({
     label: {
         type: String,
         required: false,
     },
-    noTooltip: Boolean
+    noTooltip: Boolean,
+    folderSelected: {
+        type: Boolean,
+        default: false,
+    },
 });
 </script>

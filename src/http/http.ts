@@ -35,8 +35,6 @@ const refreshToken = async (): Promise<SuccessResponse> => {
 }
 
 const post = async function (path: string, body: any, headers?: any, retried = 0): Promise<any> {
-	console.log('url', `${BASE_URL}${path}`)
-
 	const token = localStorage.getItem('accessToken')
 	headers = {
 		...headers,

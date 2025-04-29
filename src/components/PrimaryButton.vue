@@ -1,16 +1,16 @@
 <template>
     <q-btn
-    :class="['q-ma-' + margin, 'q-pa-' + padding, 'shadow-2']"
-    :icon="icon"
-    color="primary"
-    :label="label"
-    :outline="outline"
-    :dense="dense"
-    :loading="loading"
-    :rounded="rounded"
-    :size="size"
-    :fab="fab"
-    @click="emit('click', $event)"
+        :class="['q-ma-' + margin, 'q-pa-' + padding, 'shadow-2']"
+        :icon="icon"
+        :color="color"
+        :label="label"
+        :outline="outline"
+        :dense="dense"
+        :loading="loading"
+        :rounded="rounded"
+        :size="size"
+        :fab="fab"
+        @click="emit('click', $event)"
     >
         <slot></slot>
     </q-btn>
@@ -44,7 +44,11 @@ defineProps({
         type: String,
         default: 'md'
     },
-    fab: Boolean
+    fab: Boolean,
+    color: {
+        type: String,
+        default: 'primary'
+    }
 });
 
 const emit = defineEmits(['click']);

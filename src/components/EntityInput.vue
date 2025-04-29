@@ -35,38 +35,23 @@
         <div
             v-if="withFolder"
         >
-            <div
-                class="column fit"
-                v-if="singleFolder"
-            >
+            <div class="column fit">
                 <div class="row flex-center q-ma-md">
                     <AddFolderBtn
                         label="Selecionar pasta para arquivos"
+                        :folder-selected="folderSelected"
                         @folder-change="addFolder"
+                    />
+                    <PrimaryButton
+                        color="red"
+                        icon="delete"
+                        rounded
+                        v-if="folderSelected"
+                        @click="emptyFiles"
+                        class="q-ma-md"
                     />
                 </div>
                 <div v-if="entity!.files.length > 0" class="row flex-center text-subtitle2">Pasta: {{ entity?.files[0]?.webkitRelativePath.split('/')[0] }}</div>
-            </div>
-            <div
-                v-else
-                class="row justify-center"
-            >
-                <div>
-                    <AddFolderBtn
-                        label="Selecionar pasta para arquivos de TESTE"
-                        @folder-change="addTestFolder"
-                        class="q-ma-md"
-                    />
-                    <div v-if="entity!.testFiles.length > 0" class="row flex-center text-subtitle2">Pasta: {{ entity?.testFolderName }}</div>
-                </div>
-                <div>
-                    <AddFolderBtn
-                        label="Selecionar pasta para arquivos de TREINO"
-                        @folder-change="addTrainingFolder"
-                        class="q-ma-md"
-                    />
-                    <div v-if="entity!.trainingFiles.length > 0" class="row flex-center text-subtitle2">Pasta: {{ entity?.trainingFolderName }}</div>
-                </div>
             </div>
         </div>
     </q-card>
@@ -78,17 +63,18 @@ import CharacteristicInput from './CharacteristicInput.vue';
 import AddFolderBtn from './AddFolderBtn.vue';
 import PrimaryButton from './PrimaryButton.vue';
 import type Entity from 'src/models/entity';
+import { ref } from 'vue';
 
 defineProps({
     withCharacteristics: {
         type: Boolean,
         default: true
     },
-    withFolder: Boolean,
-    singleFolder: Boolean
+    withFolder: Boolean
 });
 
 const entity = defineModel<Entity>('entity');
+const folderSelected = ref(false);
 
 const addCharacteristic = () => {
     const newCharacteristic: Characteristic = {
@@ -107,28 +93,13 @@ const addFolder = (event: Event) => {
             entity.value!.files.push(file);
         }
     }
+
+    folderSelected.value = true;
 };
 
-const addTestFolder = (event: Event) => {
-    const target = event.target as HTMLInputElement;
-    const files = target.files;
-    if (files) {
-        entity.value!.testFolderName = files[0]?.webkitRelativePath.split('/')[0];
-        for (const file of files) {
-            entity.value!.testFiles.push(file);
-        }
-    }
-};
-
-const addTrainingFolder = (event: Event) => {
-    const target = event.target as HTMLInputElement;
-    const files = target.files;
-    if (files) {
-        entity.value!.trainingFolderName = files[0]?.webkitRelativePath.split('/')[0];
-        for (const file of files) {
-            entity.value!.trainingFiles.push(file);
-        }
-    }
+const emptyFiles = () => {
+    entity.value!.files = [];
+    folderSelected.value = false;
 };
 
 </script>
