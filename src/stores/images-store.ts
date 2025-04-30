@@ -1,8 +1,10 @@
 import { defineStore } from 'pinia';
 import { Notify } from 'quasar';
 import http from 'src/http/http';
+import type Characteristic from 'src/models/characteristics';
 import type Entity from 'src/models/entity';
 import { createEntity } from 'src/models/entity';
+import type { ModelSettings } from 'src/models/model-settings';
 
 export const useImagesStore = defineStore('counter', {
   state: () => ({
@@ -10,6 +12,8 @@ export const useImagesStore = defineStore('counter', {
       createEntity(),
     ] as Entity[],
     sessionId: '',
+    characteristics: [] as Characteristic[],
+    modelSettings: {} as ModelSettings,
   }),
 
   actions: {
@@ -69,10 +73,6 @@ export const useImagesStore = defineStore('counter', {
         }
 
         entity.files = [];
-        Notify.create({
-          message: `Arquivos da entidade ${entity.name} enviados com sucesso`,
-          color: 'positive',
-        });
       }
     },
     async uploadCharacteristicFiles() {

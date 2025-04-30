@@ -12,29 +12,7 @@
             lazy-rules
             input-class="text-h5 text-center"
         />
-        <div
-            v-if="withCharacteristics"
-        >
-            <CharacteristicInput
-                v-for="(characteristic, index) in entity!.characteristics"
-                :key="index"
-                v-model:name="characteristic.name"
-                v-model:color="characteristic.color"
-            />
-            <div class="row justify-center fit">
-                <PrimaryButton
-                    class="fit"
-                    rounded
-                    v-if="entity!.characteristics.length < 3"
-                    label="Adicionar característica"
-                    icon="add"
-                    @click="addCharacteristic"
-                />
-            </div>
-        </div>
-        <div
-            v-if="withFolder"
-        >
+        <div>
             <div class="column fit">
                 <div class="row flex-center q-ma-md">
                     <AddFolderBtn
@@ -58,32 +36,13 @@
 </template>
 
 <script setup lang="ts">
-import type Characteristic from 'src/models/characteristics';
-import CharacteristicInput from './CharacteristicInput.vue';
 import AddFolderBtn from './AddFolderBtn.vue';
 import PrimaryButton from './PrimaryButton.vue';
 import type Entity from 'src/models/entity';
 import { ref } from 'vue';
 
-defineProps({
-    withCharacteristics: {
-        type: Boolean,
-        default: true
-    },
-    withFolder: Boolean
-});
-
 const entity = defineModel<Entity>('entity');
 const folderSelected = ref(false);
-
-const addCharacteristic = () => {
-    const newCharacteristic: Characteristic = {
-        id: Date.now(),
-        name: '',
-        color: 'rgb(0,0,0)',
-    };
-    entity.value!.characteristics.push(newCharacteristic);
-};
 
 const addFolder = (event: Event) => {
     const target = event.target as HTMLInputElement;
