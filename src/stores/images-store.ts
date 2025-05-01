@@ -5,17 +5,23 @@ import type Characteristic from 'src/models/characteristics';
 import type Entity from 'src/models/entity';
 import { createEntity } from 'src/models/entity';
 import type { ModelSettings } from 'src/models/model-settings';
-import { ShowDialog } from 'src/utils';
+import { sessionFromJson, type Session } from 'src/models/session';
+import { ShowDialog, transformRgbToArray } from 'src/utils';
 
-export const useImagesStore = defineStore('counter', {
+export const useImagesStore = defineStore('session', {
   state: () => ({
+    sessionId: '',
+    selectedSession: {} as Session,
+    sessions: [] as Session[],
+    loadingSessions: false,
     entities: [
       createEntity(),
     ] as Entity[],
-    sessionId: '',
     characteristics: [] as Characteristic[],
     modelSettings: {} as ModelSettings,
-    uploadedFiles: false
+    uploadedFiles: false,
+    loadingTraining: false,
+    trainedSession: false
   }),
 
   actions: {
@@ -44,7 +50,7 @@ export const useImagesStore = defineStore('counter', {
         return;
       }
 
-      await this.createSession();
+      if (this.sessionId === '') await this.createSession();
 
       for (const entity of this.entities) {
         if (entity.files.length === 0) {
@@ -80,44 +86,65 @@ export const useImagesStore = defineStore('counter', {
         }
       }
     },
-    async uploadCharacteristicFiles() {
-      if (this.entities.length === 0) {
+    async trainSession() {
+      if (this.sessionId === '') {
         Notify.create({
-          message: 'Necessário adicionar ao menos uma entidade',
+          message: 'Necessário criar uma sessão antes de treinar',
           color: 'negative',
         });
-        
         return;
       }
 
-      const formData = new FormData();
+      if (this.characteristics.length > 0) {
+        this.modelSettings.rgb_ranges = this.characteristics.map(
+          (characteristic) => (
+            {
+              name: characteristic.name,
+              rgb: transformRgbToArray(characteristic.color),
+            }
+          ),
+        );
+      }
 
-      for (const entity of this.entities) {
-        const buffer: Array<File> = [];
-
-        entity.files.forEach((file) => {
-          if (buffer.length < 100) {
-            buffer.push(file);
-          }
+      try {
+        await http.post(`/train-from-session/${this.sessionId}`, this.modelSettings);
+        this.trainedSession = true;
+      } catch (error) {
+        console.error('Error training session:', error);
+        Notify.create({
+          message: 'Erro ao treinar sessão',
+          color: 'negative',
         });
-
-        buffer.forEach((file) => {
-          formData.append('files', file, file.name);
-        });
-        formData.append('class_name', entity.name);
-
-        try {
-          const response = await http.post('/upload', formData, {
-            'Content-Type': 'multipart/form-data',
-          });
-          console.log('Files uploaded successfully:', response);
-        } catch (error) {
-          console.error('Error uploading files:', error);
-        }
       }
     },
-    async resetSession() {
-      if (!(await ShowDialog.showConfirm('Limpar sessão', 'Deseja limpar a sessão atual?', 'negative'))) return;
+    
+    async getSessions() {
+      this.loadingSessions = true;
+
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
+      try {
+        const response = await http.get('/upload-sessions');
+        console.log('Sessions:', response);
+        this.sessions = response.sessions.map((session: any) => sessionFromJson(session));
+      } catch (error) {
+        console.error('Error getting sessions:', error);
+        Notify.create({
+          message: 'Erro ao obter sessões',
+          color: 'negative',
+        });
+      } finally {
+        this.loadingSessions = false;
+      }
+    },
+
+    selectSession(session: Session) {
+      this.selectedSession = session;
+      this.sessionId = session.session_id;
+    },
+
+    async resetSession(autoConfirm: boolean = false) {
+      if (!autoConfirm && !(await ShowDialog.showConfirm('Limpar sessão', 'Deseja limpar a sessão atual?', 'negative'))) return;
       this.uploadedFiles = false;
       this.sessionId = '';
       this.entities = [createEntity()];

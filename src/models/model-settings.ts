@@ -1,10 +1,10 @@
 export interface ModelSettings {
     epochs:           number;
-    modelName:       string;
+    model_name:       string;
     layers:           number;
-    neuronsByLayer: number;
-    testPercentage:  number;
-    rgbRanges:       RGBRange[];
+    neurons_by_layer: number;
+    test_percentage:  number;
+    rgb_ranges:       RGBRange[];
 }
 
 export interface RGBRange {
@@ -13,9 +13,9 @@ export interface RGBRange {
 }
 
 export function validateModelSettings(modelSettings: ModelSettings): boolean {
-    const { epochs, modelName, layers, neuronsByLayer, testPercentage } = modelSettings;
+    const { epochs, model_name: modelName, layers, neurons_by_layer, test_percentage } = modelSettings;
 
-    if (epochs <= 0 || layers <= 0 || neuronsByLayer <= 0 || testPercentage < 0 || testPercentage > 100) {
+    if (epochs <= 0 || layers <= 0 || neurons_by_layer <= 0 || test_percentage < 0 || test_percentage > 100) {
         return false;
     }
 

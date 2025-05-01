@@ -11,6 +11,7 @@
         :rounded="rounded"
         :size="size"
         :fab="fab"
+        :flat="flat"
         @click="emit('click', $event)"
     >
         <slot></slot>
@@ -50,7 +51,11 @@ defineProps({
         type: String,
         default: 'primary'
     },
-    disable: Boolean
+    disable: Boolean,
+    flat: {
+        type: Boolean,
+        default: false
+    }
 });
 
 const emit = defineEmits(['click']);

@@ -25,4 +25,12 @@ export function isValidNumber(value: string): boolean {
 	return /^[0-9]+$/.test(value)
 }
 
+export function transformRgbToArray (rgb: string): number[] {
+	const rgbArray = rgb.replace(/[^\d,]/g, '').split(',').map(Number)
+	if (rgbArray.length !== 3) {
+		throw new Error('Invalid RGB format')
+	}
+	return rgbArray
+}
+
 export { ShowDialog }

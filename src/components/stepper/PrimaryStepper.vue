@@ -5,9 +5,15 @@
         </q-step>
         <template v-slot:navigation>
             <div class="text-center">
-                <PrimaryButton v-if="currentStep > 1" flat @click="currentStep--" label="Voltar" class="q-ml-sm" />
-                <q-btn @click="$emit('btnEvent', currentStep)" :color="getButtonColor()" :loading="loading"
-                :label="currentStep === steps.length ? 'Concluir' : 'Continuar'"/>
+                <PrimaryButton rounded v-if="currentStep > 1" flat @click="currentStep--" label="Voltar" class="q-ml-sm" />
+                <PrimaryButton
+                    rounded
+                    v-if="finishButton || (currentStep < steps.length)"
+                    @click="$emit('btnEvent', currentStep)"
+                    :color="getButtonColor()"
+                    :loading="loading"
+                    :label="currentStep === steps.length ? 'Concluir' : 'Continuar'"
+                />
             </div>
         </template>
     </q-stepper>
@@ -31,9 +37,10 @@ defineProps({
 		type: Function,
 		required: true
 	},
-	loading: {
-		type: Boolean,
-		required: true
-	}
+	loading: Boolean,
+    finishButton: {
+        type: Boolean,
+        default: true
+    }
 })
 </script>
