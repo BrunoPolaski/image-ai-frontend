@@ -1,5 +1,6 @@
 <template>
-    <PrimaryButton 
+    <PrimaryButton
+        :disable="disable"
         rounded
         :icon="folderSelected ? 'check' : 'folder'"
         :label="folderSelected ? 'Pasta selecionada' : 'Selecionar pasta de imagens'"
@@ -7,6 +8,7 @@
         :color="folderSelected ? 'green' : 'primary'"
     />
     <input
+        :disable="disable"
         ref="folderInput"
         type="file"
         webkitdirectory
@@ -39,5 +41,6 @@ defineProps({
         type: Boolean,
         default: false,
     },
+    disable: Boolean
 });
 </script>

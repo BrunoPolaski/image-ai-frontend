@@ -5,6 +5,7 @@ import type Characteristic from 'src/models/characteristics';
 import type Entity from 'src/models/entity';
 import { createEntity } from 'src/models/entity';
 import type { ModelSettings } from 'src/models/model-settings';
+import { ShowDialog } from 'src/utils';
 
 export const useImagesStore = defineStore('counter', {
   state: () => ({
@@ -14,6 +15,7 @@ export const useImagesStore = defineStore('counter', {
     sessionId: '',
     characteristics: [] as Characteristic[],
     modelSettings: {} as ModelSettings,
+    uploadedFiles: false
   }),
 
   actions: {
@@ -46,6 +48,11 @@ export const useImagesStore = defineStore('counter', {
 
       for (const entity of this.entities) {
         if (entity.files.length === 0) {
+          Notify.create({
+            message: `Necessário adicionar ao menos um arquivo para a entidade ${entity.name}`,
+            color: 'negative',
+          });
+          console.error(`Necessário adicionar ao menos um arquivo para a entidade ${entity.name}`);
           return;
         }
         
@@ -71,8 +78,6 @@ export const useImagesStore = defineStore('counter', {
               return;
             });
         }
-
-        entity.files = [];
       }
     },
     async uploadCharacteristicFiles() {
@@ -110,6 +115,13 @@ export const useImagesStore = defineStore('counter', {
           console.error('Error uploading files:', error);
         }
       }
+    },
+    async resetSession() {
+      if (!(await ShowDialog.showConfirm('Limpar sessão', 'Deseja limpar a sessão atual?', 'negative'))) return;
+      this.uploadedFiles = false;
+      this.sessionId = '';
+      this.entities = [createEntity()];
+      this.characteristics = [] as Characteristic[];
     }
   },
 });

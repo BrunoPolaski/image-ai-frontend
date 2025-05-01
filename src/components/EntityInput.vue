@@ -1,6 +1,7 @@
 <template>
     <q-card class="column q-ma-md">
         <q-input
+            :disable="disable"
             outlined
             v-model="entity!.name"
             label="Nome da entidade"
@@ -16,11 +17,13 @@
             <div class="column fit">
                 <div class="row flex-center q-ma-md">
                     <AddFolderBtn
+                        :disable="disable"
                         label="Selecionar pasta para arquivos"
                         :folder-selected="folderSelected"
                         @folder-change="addFolder"
                     />
                     <PrimaryButton
+                        :disable="disable"
                         color="red"
                         icon="delete"
                         rounded
@@ -60,5 +63,9 @@ const emptyFiles = () => {
     entity.value!.files = [];
     folderSelected.value = false;
 };
+
+defineProps({
+    disable: Boolean
+});
 
 </script>

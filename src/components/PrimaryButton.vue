@@ -1,5 +1,6 @@
 <template>
     <q-btn
+        :disable="disable"
         :class="['q-ma-' + margin, 'q-pa-' + padding, 'shadow-2']"
         :icon="icon"
         :color="color"
@@ -48,7 +49,8 @@ defineProps({
     color: {
         type: String,
         default: 'primary'
-    }
+    },
+    disable: Boolean
 });
 
 const emit = defineEmits(['click']);
