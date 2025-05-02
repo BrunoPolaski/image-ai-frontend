@@ -60,7 +60,7 @@ export const useImagesStore = defineStore('session', {
           const batch = entity.files.slice(i, i + 50);
           const formData = new FormData();
   
-          formData.append('class_name', entity.name);
+          formData.append('class_name', entity.name.replace(/\s+/g, '_'));
           batch.forEach((file) => {
             formData.append('files', file, file.name);
           });
@@ -104,8 +104,8 @@ export const useImagesStore = defineStore('session', {
             rgb: transformRgbToArray(characteristic.rgb),
           }));
 
-          this.modelSettings.rgb_ranges.push({
-            class_name: entity.name,
+          this.modelSettings.rgb_ranges = (this.modelSettings.rgb_ranges || []).concat({
+            class_name: entity.name.replace(/\s+/g, '_'),
             rgb_ranges: rgbRanges,
           });
         }

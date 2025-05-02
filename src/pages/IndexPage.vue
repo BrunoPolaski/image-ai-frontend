@@ -37,8 +37,9 @@
       />
     </div>
 
-    <q-card class="width-50 bordered q-py-md">
+    <q-card class="bg-grey-2 width-50 bordered q-py-md">
       <q-table
+        :rows-per-page-options="[4]"
         card-container-class="row flex-center fit"
         card-class="bg-primary text-white bordered"
         grid
@@ -85,6 +86,7 @@
         />
       </div>
       <PrimaryStepper
+        class="bg-grey-2"
         v-else
         v-model:current-step="step"
         :get-button-color="getButtonColor"
@@ -315,20 +317,21 @@ const trainSession = async () => {
     }
 
     try {
-        await imagesStore.trainSession();
+        await imagesStore.trainSession(withCharacteristics.value);
         Notify.create({
             message: 'Treinamento iniciado com sucesso',
             color: 'positive',
             position: 'top',
             timeout: 2000,
         });
-    } catch {
+    } catch (error:any) {
         Notify.create({
             message: 'Erro ao iniciar o treinamento',
             color: 'negative',
             position: 'top',
             timeout: 2000,
         });
+        console.error(error);
     }
 };
 

@@ -2,11 +2,14 @@ import { defineStore } from 'pinia';
 import { Notify } from 'quasar';
 import { NotFoundError } from 'src/http/errors/notFoundError';
 import http from 'src/http/http';
+import type Characteristic from 'src/models/characteristics';
 import { modelFromJson, type Model } from 'src/models/model';
+import { transformRgbToArray } from 'src/utils';
 import { capitalize } from 'vue';
 
 export const useModelStore = defineStore('model', {
   state: () => ({
+    characteristics: [{},{},{}] as Characteristic[],
     loadingModels: false,
     rgbModels: [] as Model[],
     cnnModels: [] as Model[],
@@ -114,6 +117,49 @@ export const useModelStore = defineStore('model', {
           color: 'negative',
         });
       }
-    }
+    },
+    
+    async classifyImageRgb(modelName: string) {
+      if (!this.image) {
+        Notify.create({
+          message: 'Nenhuma imagem selecionada',
+          color: 'negative',
+        });
+        return;
+      }
+
+      try {
+        const formData = new FormData();
+        formData.append('file', this.image);
+
+        const response = await http.post('/upload-single', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+
+        console.log('Image session created:', response.session_id);
+
+        const classificationResponse = await http.post(`/rgb/classify-image/${response.session_id}`, {
+          model_name: modelName.toLowerCase(),
+          rgb_ranges: this.characteristics.map((characteristic) => ({
+            name: characteristic.name,
+            rgb: transformRgbToArray(characteristic.rgb),
+          })),
+        });
+
+        console.log('Classification response:', classificationResponse);
+        this.classificationResult = classificationResponse.result.class_name;
+        this.classificationProbability = classificationResponse.result.confidence;
+
+        this.dialogOpen = true;
+      } catch (error) {
+        console.error('Error classifying image:', error);
+        Notify.create({
+          message: 'Erro ao classificar imagem',
+          color: 'negative',
+        });
+      }
+    },
   },
 });

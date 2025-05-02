@@ -5,7 +5,7 @@
       class="fit"
       filled
       dense
-      v-model="name"
+      v-model.trim="name"
       label="Nome da característica"
       color="black"
       bg-color="white"
@@ -16,12 +16,14 @@
       lazy-rules
     />
     <q-input
+      lazy-rules
       :disable="disable"
       class="fit"
-      v-model="color"
+      v-model.trim="color"
       filled
       dense
       label="Cor da característica"
+      format-model
       :rules="[
         (val: string) => !!val || 'Campo obrigatório',
         (val: string) => /^rgb\(\d{1,3},\d{1,3},\d{1,3}\)$/.test(val) || 'Formato inválido'
@@ -36,6 +38,7 @@
           <q-popup-proxy transition-show="scale" transition-hide="scale">
             <q-color
               v-model="color"
+              format-model="rgb"
             />
           </q-popup-proxy>
         </q-icon>

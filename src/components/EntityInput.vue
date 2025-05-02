@@ -3,7 +3,7 @@
         <q-input
             :disable="disable"
             outlined
-            v-model="entity!.name"
+            v-model.trim="entity!.name"
             label="Nome da entidade"
             class="q-ma-md"
             :rules="[
