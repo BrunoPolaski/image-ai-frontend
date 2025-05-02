@@ -32,7 +32,7 @@
         label="Reiniciar sessão"
         rounded
         color="grey"
-        @click="imagesStore.resetSession"
+        @click="imagesStore.resetSession(false)"
         class="q-ma-md"
       />
     </div>
@@ -77,7 +77,7 @@
           </div>
         </template>
       </q-table>
-      <div v-else-if="imagesStore.loadingSessions" class="fit q-ma-md">
+      <div v-else-if="imagesStore.loadingSessions" class="row flex-center fit q-ma-md">
         <q-spinner-dots
           size="50px"
           color="primary"
@@ -124,6 +124,7 @@
                 Para adicionar mais imagens para uma entidade já cadastrada, apenas use o mesmo nome.
               </div>
               <EntityInput
+                  :with-characteristics="withCharacteristics"
                   :disable="imagesStore.uploadedFiles"
                   class="q-ma-md bordered"
                   v-for="entity in imagesStore.entities"
@@ -152,35 +153,17 @@
           </q-form>
         </template>
         <template #step-2>
-          <div v-if="withCharacteristics" >
-              <CharacteristicInput
-                v-for="(characteristic, index) in imagesStore.characteristics"
-                :key="index"
-                v-model:name="characteristic.name"
-                v-model:color="characteristic.color"
-              />
-              <div class="row justify-center fit">
-                <PrimaryButton
-                    class="fit"
-                    rounded
-                    v-if="imagesStore.characteristics.length < 3"
-                    label="Adicionar característica"
-                    icon="add"
-                    @click="addCharacteristic"
-                />
-              </div>
-          </div>
           <div>
             <q-input dense v-model.trim="imagesStore.modelSettings.model_name" label="Nome do modelo. Obrigatório." class="q-ma-md"
               :rules="[(val: string) => !!val || 'Campo obrigatório']" lazy-rules />
             <q-input dense v-model.trim="imagesStore.modelSettings.epochs" label="Número de épocas. Padrão: 30." class="q-ma-md"
-              :rules="[(val: string) => !!val && isValidNumber(val) || 'Campo obrigatório']" lazy-rules />
+              :rules="[(val: string) => !val || isValidNumber(val) || 'Campo obrigatório']" lazy-rules />
             <q-input dense v-model.trim="imagesStore.modelSettings.layers" label="Número de camadas. Padrão: 6." class="q-ma-md"
-              :rules="[(val: string) => !!val && isValidNumber(val) || 'Campo obrigatório']" lazy-rules />
+              :rules="[(val: string) => !val || isValidNumber(val) || 'Campo obrigatório']" lazy-rules />
             <q-input dense v-model.trim="imagesStore.modelSettings.neurons_by_layer" label="Número de neurônios por camada. Padrão: 6." class="q-ma-md"
-              :rules="[(val: string) => !!val && isValidNumber(val) || 'Campo obrigatório']" lazy-rules />
+              :rules="[(val: string) => !val || isValidNumber(val) || 'Campo obrigatório']" lazy-rules />
             <q-input dense v-model.trim="imagesStore.modelSettings.test_percentage" label="Porcentagem de arquivos para teste. Padrão: 20." class="q-ma-md"
-              :rules="[(val: string) => !!val && isValidNumber(val) || 'Campo obrigatório']" lazy-rules />
+              :rules="[(val: string) => !val || isValidNumber(val) || 'Campo obrigatório']" lazy-rules />
           </div>
           <PrimaryButton
             rounded
@@ -199,11 +182,9 @@
 <script setup lang="ts">
 import type { QTableColumn } from 'quasar';
 import { Notify } from 'quasar';
-import CharacteristicInput from 'src/components/CharacteristicInput.vue';
 import EntityInput from 'src/components/EntityInput.vue';
 import PrimaryButton from 'src/components/PrimaryButton.vue';
 import PrimaryStepper from 'src/components/stepper/PrimaryStepper.vue';
-import type Characteristic from 'src/models/characteristics';
 import { createEntity } from 'src/models/entity';
 import { validateModelSettings } from 'src/models/model-settings';
 import type { Session } from 'src/models/session';
@@ -235,38 +216,33 @@ const steps = [
     { id: 2, title: 'Configurações do modelo', icon: 'settings', caption: 'Defina as configurações do modelo' },
 ];
 
-const addCharacteristic = () => {
-    const newCharacteristic: Characteristic = {
-        name: '',
-        color: 'rgb(0,0,0)',
-    };
-    imagesStore.characteristics.push(newCharacteristic);
-};
-
 
 onBeforeMount(() => {
     imagesStore.entities = [createEntity()];
 });
 
 const getButtonColor = () => {
-  return (step.value === 1 && ((imagesStore.entities.length < 3 && withCharacteristics) || !withCharacteristics.value) && imagesStore.uploadedFiles || imagesStore.selectedSession.session_id) ||
-    (step.value === 2 && validateModelSettings(imagesStore.modelSettings) && (!withCharacteristics.value || imagesStore.characteristics.length > 0) && imagesStore.trainedSession)
-    ? 'primary'
-    : 'grey';
+  if (step.value === 1 && canProceedToStep2()) {
+    return 'primary';
+  } else if (step.value === 2 && trainedModel()) {
+    return 'primary';
+  }
+
+  return 'grey';
 };
 
 const validateForm = async () => {
-    if (step.value === 1 && ((imagesStore.entities.length < 3 && withCharacteristics) || !withCharacteristics.value) && imagesStore.uploadedFiles || imagesStore.selectedSession.session_id) {
-        step.value++;
-    } else if (step.value === 2 && validateModelSettings(imagesStore.modelSettings) && (!withCharacteristics.value || imagesStore.characteristics.length > 0) || (imagesStore.selectedSession.session_id && imagesStore.modelSettings.model_name)) {
-        step.value = 1;
-        listedSessionsOn.value = true;
+    if (step.value === 1 && canProceedToStep2()) {
+      step.value++;
+    } else if (step.value === 2 && trainedModel()) {
+      step.value = 1;
+      listedSessionsOn.value = true;
 
-        await imagesStore.resetSession(true);
-        for (let i = 0; i < 3; i++) {
-            await imagesStore.getSessions();
-            await new Promise((resolve) => setTimeout(resolve, 10000));
-        }
+      await imagesStore.resetSession(true);
+      for (let i = 0; i < 3; i++) {
+          await imagesStore.getSessions();
+          await new Promise((resolve) => setTimeout(resolve, 10000));
+      }
     } else {
       Notify.create({
         message: 'Preencha todos os campos obrigatórios',
@@ -275,6 +251,24 @@ const validateForm = async () => {
         timeout: 2000,
       });
     }
+};
+
+const canProceedToStep2 = () => {
+  if (imagesStore.selectedSession.session_id) return true;
+  if (withCharacteristics.value) {
+    return imagesStore.uploadedFiles &&
+           imagesStore.entities.length > 0 &&
+           imagesStore.entities.length <= 3 &&
+           !imagesStore.entities.some(e => e.characteristics.length === 0);
+  } else {
+    return imagesStore.uploadedFiles;
+  }
+};
+
+const trainedModel = () => {
+  return validateModelSettings(imagesStore.modelSettings) ||
+    (imagesStore.selectedSession.session_id && imagesStore.modelSettings.model_name) &&
+    imagesStore.trainedSession;
 };
 
 const uploadFiles = async () => {
@@ -297,9 +291,9 @@ const uploadFiles = async () => {
             position: 'top',
             timeout: 2000,
         });
-    } catch {
+    } catch (e: any) {
         Notify.create({
-            message: 'Erro ao enviar arquivos',
+            message: e.message,
             color: 'negative',
             position: 'top',
             timeout: 2000,
@@ -339,7 +333,7 @@ const trainSession = async () => {
 };
 
 const reconfigureSession = async (session: Session) => {
-  await imagesStore.resetSession();
+  await imagesStore.resetSession(false);
   
   imagesStore.selectSession(session);
 

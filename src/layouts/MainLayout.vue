@@ -11,7 +11,7 @@
       <q-page-scroller
         reverse
         position="bottom-right"
-        :scroll-offset="10"
+        :scroll-offset="30"
         :offset="[20, 20]">
         <q-btn
           fab

@@ -4,7 +4,12 @@ export interface ModelSettings {
     layers:           number;
     neurons_by_layer: number;
     test_percentage:  number;
-    rgb_ranges:       RGBRange[];
+    rgb_ranges:       EntityRgbRange[];
+}
+
+export interface EntityRgbRange {
+    class_name: string;
+    rgb_ranges: RGBRange[];
 }
 
 export interface RGBRange {

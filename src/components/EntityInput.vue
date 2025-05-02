@@ -14,9 +14,9 @@
             input-class="text-h5 text-center"
         />
         <div>
-            <div class="column fit">
-                <div class="row flex-center q-ma-md">
-                    <AddFolderBtn
+            <div class="column">
+                <div class="row flex-center">
+                    <FolderPicker
                         :disable="disable"
                         label="Selecionar pasta para arquivos"
                         :folder-selected="folderSelected"
@@ -35,14 +35,40 @@
                 <div v-if="entity!.files.length > 0" class="row flex-center text-subtitle2">Pasta: {{ entity?.files[0]?.webkitRelativePath.split('/')[0] }}</div>
             </div>
         </div>
+        <div
+            v-if="withCharacteristics"
+        >
+            <CharacteristicInput
+                :disable="disable"
+                v-for="(characteristic, index) in entity!.characteristics"
+                :key="index"
+                v-model:name="characteristic.name"
+                v-model:color="characteristic.rgb"
+            />
+        </div>
+        <div
+            class="row flex-center"
+            v-if="withCharacteristics"
+        >
+            <PrimaryButton
+                :disable="disable"
+                rounded
+                v-if="entity!.characteristics.length < 3"
+                label="Adicionar característica"
+                icon="add"
+                @click="addCharacteristic"
+            />
+        </div>
     </q-card>
 </template>
 
 <script setup lang="ts">
-import AddFolderBtn from './AddFolderBtn.vue';
+import type Characteristic from 'src/models/characteristics';
+import FolderPicker from './FolderPicker.vue';
 import PrimaryButton from './PrimaryButton.vue';
 import type Entity from 'src/models/entity';
 import { ref } from 'vue';
+import CharacteristicInput from './CharacteristicInput.vue';
 
 const entity = defineModel<Entity>('entity');
 const folderSelected = ref(false);
@@ -59,13 +85,25 @@ const addFolder = (event: Event) => {
     folderSelected.value = true;
 };
 
+const addCharacteristic = () => {
+    const newCharacteristic: Characteristic = {
+        name: '',
+        rgb: 'rgb(0,0,0)',
+    };
+    entity.value!.characteristics.push(newCharacteristic);
+};
+
 const emptyFiles = () => {
     entity.value!.files = [];
     folderSelected.value = false;
 };
 
 defineProps({
-    disable: Boolean
+    disable: Boolean,
+    withCharacteristics: {
+        type: Boolean,
+        default: true,
+    },
 });
 
 </script>

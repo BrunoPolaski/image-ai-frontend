@@ -13,6 +13,7 @@
         type="file"
         webkitdirectory
         multiple
+        accept=".jpg, .jpeg, .png, .webp, .bmp, .gif"
         style="display: none"
         @change="$emit('folderChange', $event)"
     />

@@ -33,4 +33,20 @@ export function transformRgbToArray (rgb: string): number[] {
 	return rgbArray
 }
 
+export function intToPercentage(value: number): string {
+	const percentage = value * 100
+	return percentage.toFixed(2) + '%'
+}
+
+export function getProbabilityColor(value: number): string {
+	const percentage = value * 100
+	if (percentage >= 80) {
+		return 'positive'
+	} else if (percentage >= 30) {
+		return 'warning'
+	} else {
+		return 'negative'
+	}
+}
+
 export { ShowDialog }

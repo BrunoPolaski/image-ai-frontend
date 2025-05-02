@@ -1,6 +1,7 @@
 <template>
   <div class="column flex-center q-pa-md q-ma-md bordered" :style="getStyle">
     <q-input
+      :disable="disable"
       class="fit"
       filled
       dense
@@ -15,6 +16,7 @@
       lazy-rules
     />
     <q-input
+      :disable="disable"
       class="fit"
       v-model="color"
       filled
@@ -45,6 +47,10 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
+
+defineProps({
+  disable: Boolean,
+});
 
 const name = defineModel<string>('name');
 const color = defineModel<string>('color');

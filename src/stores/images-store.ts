@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { Notify } from 'quasar';
+import { NotFoundError } from 'src/http/errors/notFoundError';
 import http from 'src/http/http';
-import type Characteristic from 'src/models/characteristics';
 import type Entity from 'src/models/entity';
 import { createEntity } from 'src/models/entity';
 import type { ModelSettings } from 'src/models/model-settings';
@@ -17,7 +17,6 @@ export const useImagesStore = defineStore('session', {
     entities: [
       createEntity(),
     ] as Entity[],
-    characteristics: [] as Characteristic[],
     modelSettings: {} as ModelSettings,
     uploadedFiles: false,
     loadingTraining: false,
@@ -54,12 +53,7 @@ export const useImagesStore = defineStore('session', {
 
       for (const entity of this.entities) {
         if (entity.files.length === 0) {
-          Notify.create({
-            message: `Necessário adicionar ao menos um arquivo para a entidade ${entity.name}`,
-            color: 'negative',
-          });
-          console.error(`Necessário adicionar ao menos um arquivo para a entidade ${entity.name}`);
-          return;
+          throw new Error(`Necessário adicionar ao menos um arquivo para a entidade ${entity.name}`);
         }
         
         for (let i = 0; i < entity.files.length; i += 50) {
@@ -86,7 +80,7 @@ export const useImagesStore = defineStore('session', {
         }
       }
     },
-    async trainSession() {
+    async trainSession(withCharacteristics: boolean = false) {
       if (this.sessionId === '') {
         Notify.create({
           message: 'Necessário criar uma sessão antes de treinar',
@@ -95,15 +89,26 @@ export const useImagesStore = defineStore('session', {
         return;
       }
 
-      if (this.characteristics.length > 0) {
-        this.modelSettings.rgb_ranges = this.characteristics.map(
-          (characteristic) => (
-            {
-              name: characteristic.name,
-              rgb: transformRgbToArray(characteristic.color),
-            }
-          ),
-        );
+      for (const entity of this.entities) {
+        if (withCharacteristics && entity.characteristics.length === 0) {
+          Notify.create({
+            message: `Necessário adicionar ao menos uma característica para a entidade ${entity.name}`,
+            color: 'negative',
+          });
+          return;
+        }
+
+        if (withCharacteristics) {
+          const rgbRanges = entity.characteristics.map((characteristic) => ({
+            name: characteristic.name,
+            rgb: transformRgbToArray(characteristic.rgb),
+          }));
+
+          this.modelSettings.rgb_ranges.push({
+            class_name: entity.name,
+            rgb_ranges: rgbRanges,
+          });
+        }
       }
 
       try {
@@ -124,15 +129,22 @@ export const useImagesStore = defineStore('session', {
       await new Promise((resolve) => setTimeout(resolve, 2000));
 
       try {
-        const response = await http.get('/upload-sessions');
+        const response = await http.get('/list-upload-sessions');
         console.log('Sessions:', response);
         this.sessions = response.sessions.map((session: any) => sessionFromJson(session));
       } catch (error) {
         console.error('Error getting sessions:', error);
-        Notify.create({
-          message: 'Erro ao obter sessões',
-          color: 'negative',
-        });
+        if (error instanceof NotFoundError) {
+          Notify.create({
+            message: 'Nenhuma sessão encontrada',
+            color: 'warning',
+          });
+        } else {
+          Notify.create({
+            message: 'Erro ao obter sessões',
+            color: 'negative',
+          });
+        }
       } finally {
         this.loadingSessions = false;
       }
@@ -144,11 +156,13 @@ export const useImagesStore = defineStore('session', {
     },
 
     async resetSession(autoConfirm: boolean = false) {
-      if (!autoConfirm && !(await ShowDialog.showConfirm('Limpar sessão', 'Deseja limpar a sessão atual?', 'negative'))) return;
+      if (!autoConfirm) {
+        if (!(await ShowDialog.showConfirm('Limpar sessão', 'Deseja limpar a sessão atual?', 'negative'))) return;
+      }
       this.uploadedFiles = false;
+      this.trainedSession = false;
       this.sessionId = '';
       this.entities = [createEntity()];
-      this.characteristics = [] as Characteristic[];
     }
   },
 });
